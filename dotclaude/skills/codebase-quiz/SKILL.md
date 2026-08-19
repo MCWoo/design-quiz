@@ -60,11 +60,26 @@ that to decide how much work a refresh actually needs:
 
 ### How to extract
 
-Read broadly before writing anything — directory structure, entry points, the files with the
-most git history/churn if that's available, anything that looks like it embodies a deliberate
-choice rather than boilerplate. You're looking for decisions, not just facts. "This file has a
-`UserService` class" is not a design principle. "This codebase separates data access from
-business logic via a repository pattern, and the reason appears to be X" is.
+Read the whole codebase, not a sample of it. Start with directory structure and entry points to
+orient yourself, but then actually work through every source file (excluding generated code,
+vendored dependencies, build output, and binary/data assets) — not just the files that look
+interesting from their names or the ones with the most git churn. A subtle but important design
+decision can live in a 40-line file nobody would guess to open, and "I read the obviously
+important-looking files" quietly turns into "I only found what I already expected to find."
+You're looking for decisions, not just facts. "This file has a `UserService` class" is not a
+design principle. "This codebase separates data access from business logic via a repository
+pattern, and the reason appears to be X" is.
+
+For anything beyond a small codebase, reading every file yourself in one linear pass is slow and
+prone to fatigue-skimming toward the end. Prefer fanning the work out to a handful of subagents in
+parallel, each assigned a distinct slice of the tree (by module/package/directory — pick a split
+that keeps slices roughly balanced in size). Give each one the same extraction criteria as this
+section and have it report back principle candidates (with file/line references, category, and
+difficulty) plus any improvement-idea candidates, rather than writing files directly — you merge
+their findings into the one `DESIGN_PRINCIPLES.md` yourself afterward, so the final file reads as
+one coherent document instead of stitched-together fragments with inconsistent voice or
+duplicated principles found by more than one subagent. On a refresh where only a few files changed
+(see above), this fan-out usually isn't necessary — a direct read of the diff is faster.
 
 While reading, if something looks less like "a decision worth teaching" and more like an actual
 flaw — a real bug, two places that quietly disagree, a spot where the codebase's own stated
