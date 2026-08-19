@@ -172,13 +172,14 @@ prematurely; let the user set the pace.
 
 For each question:
 
-1. **Pick a principle** from the current category that hasn't been asked yet this session (check
-   the progress log for recently-covered principles too, so repeat sessions don't retread the
-   same ground back-to-back). Normally pick one at the current adaptive difficulty level — but
-   see "Periodic breadth probes" below for why that's a default, not a rule, and why favoring a
-   principle nobody's touched yet over one that's merely at-level matters even on ordinary
-   questions: a study session that only ever revisits the same well-worn principles at
-   incrementally shifting difficulty teaches less than one that actually works through the file.
+1. **Pick a target difficulty, then a principle at that difficulty**, from the current category,
+   that hasn't been asked yet this session (check the progress log for recently-covered
+   principles too, so repeat sessions don't retread the same ground back-to-back). See "Sampling
+   difficulty around the current level" below for how the target difficulty isn't simply "always
+   the current adaptive level" — and favor a principle nobody's touched yet over one that's
+   merely at the target difficulty when you have a choice: a study session that only ever
+   revisits the same well-worn principles at incrementally shifting difficulty teaches less than
+   one that actually works through the file.
 2. **Ask an open-ended question** that requires explaining the *why*, not just naming the
    concept — e.g. not "what pattern is used in `cache.py`?" but "this codebase evicts cache
    entries with an LRU policy in `cache.py` — why might that be a better fit here than a simple
@@ -204,11 +205,10 @@ For each question:
    ask something, answer it fully per step 3's detour handling, and let it sharpen the
    `LEARNING_NOTES.md` entry in step 7 — a gap the user actively asked to close is worth recording
    more precisely than one that was only silently noted.
-6. **Adjust the difficulty one step** based on the answer: move up a level on a strong answer,
-   down a level on a weak one, hold steady on a partial answer. Don't swing more than one level
-   at a time — a single lucky or unlucky answer shouldn't wildly overcorrect. A breadth-probe
-   question (see below) is graded the same way you'd grade any answer, but adjust the *ladder*
-   itself asymmetrically — see that section for why.
+6. **Adjust the current adaptive level** based on the answer — normally by one step: up on a
+   strong answer, down on a weak one, hold on a partial. When the question's target difficulty
+   wasn't the current level (see below), the adjustment isn't symmetric — see "Sampling
+   difficulty around the current level" for how big a swing is warranted and in which direction.
 7. **On a partial or weak answer, log it to the repo's `LEARNING_NOTES.md`** (repo root) for the
    user to revisit later — see format below. Don't log strong answers; this section is meant to
    stay a short, high-signal "what to review" list, not a full transcript.
@@ -220,7 +220,7 @@ For each question:
 9. **Update the progress log** (below) after every question, not just at the end of the
    session — if the session is interrupted, you don't want to lose the record.
 
-### Periodic breadth probes
+### Sampling difficulty around the current level
 
 Adaptive difficulty is a hill-climbing algorithm: it's built to converge on "the one level this
 user is comfortable at," and it's good at that. But left alone, that's *all* it optimizes for — a
@@ -229,29 +229,43 @@ wherever the user happens to land, quietly never touching the principles well be
 (assumed already known) or well above it (assumed out of reach). Both assumptions are often
 wrong, and a study tool exists to find out, not to assume.
 
-So roughly every four or five questions — a feel, not a counter to track precisely — deliberately
-reach outside the current adaptive level once, in either direction:
+Rather than treating "at the current level" as the default and occasionally overriding it with a
+scheduled probe, treat every question's target difficulty as drawn from a distribution centered
+on the current level — a bell curve, not a fixed point with periodic exceptions. In practice
+(there's no literal dice to roll, so approximate this by feel each time rather than computing it):
+most questions should land exactly on the current level, a smaller share one level off in either
+direction, fewer still two levels off, and the true extremes — `basic`, `subject-matter-expert` —
+should show up now and then even for a user who's settled well away from them, just rarely. Vary
+this genuinely question to question rather than falling into a mechanical pattern (e.g. always
+exactly-on-level except every Nth question) — the point is that reaching away from the current
+level is a normal, everyday possibility, not a special scheduled event. Six levels is few enough
+that the curve should genuinely feel truncated toward the ends rather than smoothly tapering to
+zero — that's fine and expected, not something to correct for. When the current level is already
+near an edge (e.g. `experienced-professional` or higher), let more of the curve's mass fall on
+the near side rather than trying to preserve symmetry past the boundary.
 
-- **An easier probe** (pull from `basic` or `coding-bootcamp` regardless of where the user's
-  current level sits): mostly a foundation check. A correct answer here isn't very informative —
-  it's expected — so don't treat it as evidence to climb further; just move on normally. A
-  *wrong* answer, though, is a real finding the ordinary adaptive process would never have
-  surfaced on its own, since it never looks below where the user already settled. Take it
-  seriously: log it to `LEARNING_NOTES.md` like any weak answer, and don't be afraid to drop the
-  adaptive level more than the usual one step — a genuine gap this far below where they've been
-  answering is a bigger deal than an ordinary early-professional miss.
-- **A harder probe** (reach for `experienced-professional` or `subject-matter-expert`): a stretch
-  question, offered in the spirit of "let's see" rather than "you should know this." A correct
-  answer is a real, useful signal — consider jumping the level up by more than the usual one
-  step, since they cleared something well past where you'd placed them. A wrong or partial
-  answer is entirely expected and not a real finding; explain the fuller picture as always, but
-  don't log it as harshly or let it pull the level down at all — they were never expected to have
-  this yet.
+The *grading consequence* of a question should scale with how far its target difficulty was from
+the current level, and it's asymmetric by direction — the same principle the fixed-cadence probes
+used, now generalized to apply continuously rather than only on scheduled ones:
 
-Prefer a principle that hasn't come up yet this session (or recent ones, per the progress log)
-for the probe, the same as ordinary question selection — a probe is at its most useful when it's
-also filling in a genuine coverage gap, not just re-testing a principle you already asked about
-at a different difficulty.
+- **Clearing a question pulled from above the current level** is real, useful evidence — the
+  farther above, the stronger the evidence — and can justify jumping the level up by more than
+  the usual one step. Missing one, though, is the expected outcome and shouldn't pull the level
+  down at all; treat it like a routine question they simply weren't ready for yet, explain the
+  fuller picture as always, but don't grade it harshly against them.
+- **Missing a question pulled from below the current level** is a real finding the ordinary
+  one-step-at-a-time adjustment would never have surfaced on its own, since it never looks below
+  where the user already settled — the farther below, the more it matters, and it can justify
+  dropping the level by more than one step. Log it to `LEARNING_NOTES.md` like any weak answer.
+  Clearing one, though, is expected and not very informative — just move on normally, no special
+  credit.
+- **A question at (or one level from) the current level** behaves as described in step 6 above:
+  ordinary one-step adjustment, nothing special.
+
+Favor a principle that hasn't come up yet this session (or recent ones, per the progress log)
+regardless of which difficulty you're aiming for — reaching away from the current level is most
+useful when it's also filling in a genuine coverage gap, not just re-testing a principle you
+already asked about at a different difficulty.
 
 ### Logging weak answers to LEARNING_NOTES.md
 
