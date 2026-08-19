@@ -172,9 +172,13 @@ prematurely; let the user set the pace.
 
 For each question:
 
-1. **Pick a principle** from the current category at the current difficulty level that hasn't
-   been asked yet this session (check the progress log for recently-covered principles too, so
-   repeat sessions don't retread the same ground back-to-back).
+1. **Pick a principle** from the current category that hasn't been asked yet this session (check
+   the progress log for recently-covered principles too, so repeat sessions don't retread the
+   same ground back-to-back). Normally pick one at the current adaptive difficulty level — but
+   see "Periodic breadth probes" below for why that's a default, not a rule, and why favoring a
+   principle nobody's touched yet over one that's merely at-level matters even on ordinary
+   questions: a study session that only ever revisits the same well-worn principles at
+   incrementally shifting difficulty teaches less than one that actually works through the file.
 2. **Ask an open-ended question** that requires explaining the *why*, not just naming the
    concept — e.g. not "what pattern is used in `cache.py`?" but "this codebase evicts cache
    entries with an LRU policy in `cache.py` — why might that be a better fit here than a simple
@@ -191,19 +195,63 @@ For each question:
    off — and explain what was missing or what the fuller picture looks like, the way a good
    mentor would after a real conversation. Don't just say "correct" — reinforce or correct the
    underlying concept, since the goal is the user learning it, not scoring a point.
-5. **Adjust the difficulty one step** based on the answer: move up a level on a strong answer,
+5. **On anything short of a fully solid answer, invite questions before moving on** — something
+   as simple as "anything about this you want to dig into before we continue?" A grade-and-move-on
+   loop is efficient but it's not actually how people learn something they got wrong; the moment
+   right after being told what they missed is when a clarifying question is most useful, and
+   waiting for the user to volunteer one on their own (rather than being asked) means a quieter
+   or less confident user gets less out of the session than an assertive one would. If they do
+   ask something, answer it fully per step 3's detour handling, and let it sharpen the
+   `LEARNING_NOTES.md` entry in step 7 — a gap the user actively asked to close is worth recording
+   more precisely than one that was only silently noted.
+6. **Adjust the difficulty one step** based on the answer: move up a level on a strong answer,
    down a level on a weak one, hold steady on a partial answer. Don't swing more than one level
-   at a time — a single lucky or unlucky answer shouldn't wildly overcorrect.
-6. **On a partial or weak answer, log it to the repo's `LEARNING_NOTES.md`** (repo root) for the
+   at a time — a single lucky or unlucky answer shouldn't wildly overcorrect. A breadth-probe
+   question (see below) is graded the same way you'd grade any answer, but adjust the *ladder*
+   itself asymmetrically — see that section for why.
+7. **On a partial or weak answer, log it to the repo's `LEARNING_NOTES.md`** (repo root) for the
    user to revisit later — see format below. Don't log strong answers; this section is meant to
    stay a short, high-signal "what to review" list, not a full transcript.
-7. **If the discussion — the question, the user's answer, or a detour they asked about — surfaces
+8. **If the discussion — the question, the user's answer, or a detour they asked about — surfaces
    a genuine codebase improvement** rather than just a gap in the user's knowledge, log it per
    "Surfacing codebase improvements" below. This comes up often: explaining *why* a pattern is
    used is exactly the kind of scrutiny that reveals when it's been applied inconsistently or
    when a "principle" the file describes doesn't actually hold everywhere.
-8. **Update the progress log** (below) after every question, not just at the end of the
+9. **Update the progress log** (below) after every question, not just at the end of the
    session — if the session is interrupted, you don't want to lose the record.
+
+### Periodic breadth probes
+
+Adaptive difficulty is a hill-climbing algorithm: it's built to converge on "the one level this
+user is comfortable at," and it's good at that. But left alone, that's *all* it optimizes for — a
+session that only ever asks at-level questions will spend its whole time in a narrow band around
+wherever the user happens to land, quietly never touching the principles well below that band
+(assumed already known) or well above it (assumed out of reach). Both assumptions are often
+wrong, and a study tool exists to find out, not to assume.
+
+So roughly every four or five questions — a feel, not a counter to track precisely — deliberately
+reach outside the current adaptive level once, in either direction:
+
+- **An easier probe** (pull from `basic` or `coding-bootcamp` regardless of where the user's
+  current level sits): mostly a foundation check. A correct answer here isn't very informative —
+  it's expected — so don't treat it as evidence to climb further; just move on normally. A
+  *wrong* answer, though, is a real finding the ordinary adaptive process would never have
+  surfaced on its own, since it never looks below where the user already settled. Take it
+  seriously: log it to `LEARNING_NOTES.md` like any weak answer, and don't be afraid to drop the
+  adaptive level more than the usual one step — a genuine gap this far below where they've been
+  answering is a bigger deal than an ordinary early-professional miss.
+- **A harder probe** (reach for `experienced-professional` or `subject-matter-expert`): a stretch
+  question, offered in the spirit of "let's see" rather than "you should know this." A correct
+  answer is a real, useful signal — consider jumping the level up by more than the usual one
+  step, since they cleared something well past where you'd placed them. A wrong or partial
+  answer is entirely expected and not a real finding; explain the fuller picture as always, but
+  don't log it as harshly or let it pull the level down at all — they were never expected to have
+  this yet.
+
+Prefer a principle that hasn't come up yet this session (or recent ones, per the progress log)
+for the probe, the same as ordinary question selection — a probe is at its most useful when it's
+also filling in a genuine coverage gap, not just re-testing a principle you already asked about
+at a different difficulty.
 
 ### Logging weak answers to LEARNING_NOTES.md
 
@@ -214,7 +262,9 @@ add the section). If the file doesn't exist at all, create it with just that sec
 invent unrelated content for it.
 
 Each entry should be genuinely useful read cold, weeks later, without the quiz conversation for
-context:
+context. If the user asked a clarifying question when invited to (step 5 above), let that
+sharpen "the gap" — a specific follow-up question usually pinpoints exactly what didn't click
+better than the original graded answer alone did.
 
 ```markdown
 ## Codebase Quiz — to review
